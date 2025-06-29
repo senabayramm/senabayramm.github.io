@@ -1,0 +1,94 @@
+/* Custom CSS for DreamStyler - complementing Tailwind */
+
+/* Apply 'Inter' font globally and set default text color */
+body {
+    font-family: 'Inter', sans-serif;
+    color: #333; /* Dark gray for general text */
+}
+
+/* Base styling for the dream container */
+.dream-container {
+    /* Tailwind classes handle most of this:
+       bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl max-w-lg w-full
+       transform transition-all duration-300 ease-in-out hover:scale-105 */
+    min-height: 400px; /* Ensure a minimum height for consistent look */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Textarea styling */
+textarea {
+    resize: vertical; /* Allow vertical resizing only */
+    min-height: 150px; /* Minimum height for the textarea */
+    max-height: 300px; /* Maximum height to prevent excessive expansion */
+}
+
+/* Result container default hidden state */
+#resultContainer {
+    /* Tailwind classes handle display: hidden and transitions */
+    /* Dynamically set background color via JavaScript for genre feedback */
+    background-color: #f0f0f0; /* Light gray default background for results */
+}
+
+/* Specific genre background colors for visual feedback */
+.genre-thriller {
+    background-color: #ef4444; /* Red */
+}
+
+.genre-romance {
+    background-color: #ec4899; /* Pink */
+}
+
+.genre-fantasy {
+    background-color: #8b5cf6; /* Violet */
+}
+
+.genre-comedy {
+    background-color: #facc15; /* Yellow */
+}
+
+.genre-default {
+    background-color: #94a3b8; /* Slate */
+}
+
+/* Simple animation for genre text to pop in */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#genreResult {
+    animation: fadeInScale 0.5s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .dream-container {
+        padding: 1.5rem; /* Smaller padding on small screens */
+    }
+
+    h1 {
+        font-size: 2.5rem; /* Adjust h1 size for mobile */
+    }
+
+    p {
+        font-size: 0.95rem; /* Adjust paragraph size for mobile */
+    }
+
+    #genreResult {
+        font-size: 3rem; /* Adjust genre result text size for mobile */
+    }
+
+    #analyzeBtn {
+        font-size: 1.1rem; /* Adjust button text size for mobile */
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}

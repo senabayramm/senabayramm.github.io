@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temporality Experience - Temporal Ghosting & Decay</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Temporal Ghosting & Decay</h1>
+    <p>Interaction happens in time. Design time as much as space.</p>
+  </header>
+
+  <main>
+    <div class="canvas-container">
+      <canvas id="temporalityCanvas" width="800" height="500" tabindex="0" aria-label="Interactive Temporality Canvas"></canvas>
+      <div id="keyboardCursor" class="keyboard-cursor" hidden></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnPause" type="button">Pause Time</button>
+      <button id="btnReset" type="button">Reset Memory</button>
+      <div class="status-panel">
+        <span>Active Traces: <strong id="traceCount">0</strong></span>
+        <span>Temporal State: <strong id="temporalState">Flowing</strong></span>
+      </div>
+    </div>
+
+    <section class="instructions">
+      <h2>Temporal Rules & Accessibility</h2>
+      <ul>
+        <li><strong>Mouse / Touch:</strong> Move or click across the canvas to leave temporal traces that age and fade over time.</li>
+        <li><strong>Keyboard Navigation:</strong> Use <strong>Arrow Keys</strong> to move the cursor, and press <strong>Space / Enter</strong> to imprint memory.</li>
+        <li><strong>Pause / Resume:</strong> Click Pause or press <strong>P</strong> to freeze time.</li>
+        <li><strong>Reset:</strong> Click Reset or press <strong>R</strong> to clear the temporal archive.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

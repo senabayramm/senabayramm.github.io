@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Experience - Ecosystem Equilibrium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Ecosystem Equilibrium</h1>
+    <p>Participation is designed. Your actions directly alter the systemic balance.</p>
+  </header>
+
+  <main>
+    <div class="canvas-container">
+      <canvas id="ecosystemCanvas" width="800" height="500" tabindex="0" aria-label="Interactive Ecosystem Canvas"></canvas>
+      <div id="keyboardCursor" class="keyboard-cursor" hidden></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnPause" type="button">Pause</button>
+      <button id="btnReset" type="button">Reset Ecosystem</button>
+      <div class="status-panel">
+        <span>Active Organisms: <strong id="organismCount">0</strong></span>
+        <span>System State: <strong id="systemState">Balanced</strong></span>
+      </div>
+    </div>
+
+    <section class="instructions">
+      <h2>Controls & Accessibility</h2>
+      <ul>
+        <li><strong>Mouse / Touch:</strong> Click or tap anywhere on the canvas to inject energy and create new organisms.</li>
+        <li><strong>Keyboard Navigation:</strong> Use <strong>Arrow Keys</strong> to move the focus cursor, and press <strong>Space / Enter</strong> to inject energy.</li>
+        <li><strong>Pause / Resume:</strong> Click the Pause button or press <strong>P</strong>.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

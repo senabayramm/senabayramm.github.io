@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Experience - Thermal Equilibrium & Inertia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Thermal Equilibrium & Inertia</h1>
+    <p>The system’s state must be understandable. Design the feedback loop, not the outcome.</p>
+  </header>
+
+  <main>
+    <div class="canvas-container">
+      <canvas id="feedbackCanvas" width="800" height="500" tabindex="0" aria-label="Interactive Feedback Canvas"></canvas>
+      <div id="keyboardCursor" class="keyboard-cursor" hidden></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnHeat" type="button">Apply Heat (+)</button>
+      <button id="btnCool" type="button">Cool Down (-)</button>
+      <button id="btnPause" type="button">Pause Simulation</button>
+      <button id="btnReset" type="button">Reset System</button>
+      <div class="status-panel">
+        <span>Current Temp: <strong id="tempDisplay">20.0°C</strong></span>
+        <span>Thermal Momentum: <strong id="momentumDisplay">0.0</strong></span>
+        <span>State: <strong id="systemState">Stable</strong></span>
+      </div>
+    </div>
+
+    <section class="instructions">
+      <h2>Controls & Feedback Rules</h2>
+      <ul>
+        <li><strong>Mouse / Touch:</strong> Click top half to apply heat, bottom half to cool down.</li>
+        <li><strong>Keyboard Navigation:</strong> Use <strong>Arrow Up / Right</strong> to heat, <strong>Arrow Down / Left</strong> to cool.</li>
+        <li><strong>Pause / Resume:</strong> Click Pause or press <strong>P</strong>.</li>
+        <li><strong>Reset:</strong> Press <strong>R</strong> or click Reset to return to thermal equilibrium.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

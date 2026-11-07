@@ -1,94 +1,136 @@
-/* Custom CSS for DreamStyler - complementing Tailwind */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Apply 'Inter' font globally and set default text color */
 body {
-    font-family: 'Inter', sans-serif;
-    color: #333; /* Dark gray for general text */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #121214;
+  color: #e1e1e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-/* Base styling for the dream container */
-.dream-container {
-    /* Tailwind classes handle most of this:
-       bg-white bg-opacity-90 p-8 rounded-2xl shadow-xl max-w-lg w-full
-       transform transition-all duration-300 ease-in-out hover:scale-105 */
-    min-height: 400px; /* Ensure a minimum height for consistent look */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-/* Textarea styling */
-textarea {
-    resize: vertical; /* Allow vertical resizing only */
-    min-height: 150px; /* Minimum height for the textarea */
-    max-height: 300px; /* Maximum height to prevent excessive expansion */
+header h1 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 8px;
 }
 
-/* Result container default hidden state */
-#resultContainer {
-    /* Tailwind classes handle display: hidden and transitions */
-    /* Dynamically set background color via JavaScript for genre feedback */
-    background-color: #f0f0f0; /* Light gray default background for results */
+header p {
+  color: #a8a8b3;
+  font-size: 1rem;
 }
 
-/* Specific genre background colors for visual feedback */
-.genre-thriller {
-    background-color: #ef4444; /* Red */
+main {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.genre-romance {
-    background-color: #ec4899; /* Pink */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  border: 2px solid #323238;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #18181b;
 }
 
-.genre-fantasy {
-    background-color: #8b5cf6; /* Violet */
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  outline: none;
 }
 
-.genre-comedy {
-    background-color: #facc15; /* Yellow */
+canvas:focus {
+  border-color: #00875f;
 }
 
-.genre-default {
-    background-color: #94a3b8; /* Slate */
+.keyboard-cursor {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #00b37e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(0, 179, 126, 0.8);
 }
 
-/* Simple animation for genre text to pop in */
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.controls {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #202024;
+  padding: 12px 20px;
+  border-radius: 8px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-#genreResult {
-    animation: fadeInScale 0.5s ease-out forwards;
+button {
+  background-color: #00875f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .dream-container {
-        padding: 1.5rem; /* Smaller padding on small screens */
-    }
+button:hover {
+  background-color: #00b37e;
+}
 
-    h1 {
-        font-size: 2.5rem; /* Adjust h1 size for mobile */
-    }
+button:focus {
+  outline: 2px solid #ffffff;
+}
 
-    p {
-        font-size: 0.95rem; /* Adjust paragraph size for mobile */
-    }
+.status-panel {
+  display: flex;
+  gap: 16px;
+  font-size: 0.95rem;
+  color: #c4c4cc;
+}
 
-    #genreResult {
-        font-size: 3rem; /* Adjust genre result text size for mobile */
-    }
+.status-panel strong {
+  color: #ffffff;
+}
 
-    #analyzeBtn {
-        font-size: 1.1rem; /* Adjust button text size for mobile */
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
+.instructions {
+  width: 100%;
+  background-color: #202024;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.instructions h2 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.instructions ul {
+  list-style-type: square;
+  padding-left: 20px;
+  color: #c4c4cc;
 }

@@ -1,91 +1,243 @@
-// script.js for DreamStyler
+// ============================================================================
+// DESIGN CONFIGURATION (TASARIM YAPILANDIRMASI)
+// Bu nesne üzerindeki parametreler sistemin kurallarını ve sınırlarını belirler.
+// ============================================================================
+const DESIGN = {
+  // Görsel ve Boyut Ayarları
+  maxOrganisms: 60,            // Ekosistemin taşıyabileceği maksimum canlı sayısı (Performans & Sınır kuralı)
+  initialRadius: 8,            // Yeni doğan canlıların başlangıç yarıçapı (piksel)
+  maxRadius: 28,               // Canlıların ulaşabileceği maksimum büyüklük
+  growthRate: 0.05,            // Canlıların kare başına büyüme hızı
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. Get references to HTML elements ---
-    const dreamTextInput = document.getElementById('dreamText');
-    const analyzeButton = document.getElementById('analyzeBtn');
-    const genreResultText = document.getElementById('genreResult');
-    const resultContainer = document.getElementById('resultContainer');
-    const errorMessage = document.getElementById('errorMessage');
+  // Fiziksel & Mantıksal Kurallar
+  repulsionForce: 0.4,         // Canlıların birbirini itme kuvveti
+  decayRate: 0.02,             // Yaşlandıkça küçülme/sönümlenme hızı
+  overcrowdThreshold: 35,      // Aşırı nüfus eşiği (Sistem durumunu "Chaotic" yapar)
 
-    // --- 2. Add an event listener to the "Analyze" button ---
-    analyzeButton.addEventListener('click', analyzeDream);
+  // Klavye Navigasyon Hızı
+  keyboardStep: 15,            // Klavye yön tuşları imleç hareket adımı (piksel)
 
-    // --- Function to analyze the dream text ---
-    function analyzeDream() {
-        // --- Flowchart Logic: User enters dream text ---
-        let dreamText = dreamTextInput.value.trim(); // Get user's input and trim whitespace
-        let genre = ""; // Initialize the genre variable
+  // Renk Kodları (Renk dışında form ve boyut ile de durum temsil edilir)
+  colors: {
+    background: '#18181b',
+    normal: '#00b37e',         // Dengeli durum rengi (Yeşil tonu)
+    crowded: '#fba94c',        // Kalabalık durum rengi (Turuncu tonu)
+    cursor: '#ffffff'
+  }
+};
 
-        // --- Flowchart Logic: IF input is empty THEN show error message ---
-        if (dreamText === "") {
-            errorMessage.classList.remove('hidden'); // Show error message
-            resultContainer.classList.add('hidden'); // Hide result container
-            genreResultText.textContent = ""; // Clear previous result
-            removeGenreClasses(resultContainer); // Remove any previous genre styling
-            return; // Stop function execution if input is empty
-        } else {
-            errorMessage.classList.add('hidden'); // Hide error message if text is present
-        }
+// ============================================================================
+// STATE (SİSTEM DURUMU)
+// Sistemin anlık verilerini ve canlıların listesini tutar.
+// ============================================================================
+const state = {
+  organisms: [],
+  isPaused: false,
+  keyboardCursor: { x: 400, y: 250, visible: false },
+  canvasWidth: 800,
+  canvasHeight: 500
+};
 
-        // --- Analyze the text for keywords & Check logical conditions ---
-        // Convert dream text to lowercase for case-insensitive matching
-        const lowerCaseDreamText = dreamText.toLowerCase();
+// Canvas & DOM Elemanları
+const canvas = document.getElementById('ecosystemCanvas');
+const ctx = canvas.getContext('2d');
+const cursorEl = document.getElementById('keyboardCursor');
+const countEl = document.getElementById('organismCount');
+const stateEl = document.getElementById('systemState');
+const btnPause = document.getElementById('btnPause');
+const btnReset = document.getElementById('btnReset');
 
-        // --- Flowchart Logic: Determine appropriate film genre based on keywords ---
-        // Each keyword match should change the genre shown (as per user interaction)
-        if (lowerCaseDreamText.includes("run") || lowerCaseDreamText.includes("chase")) {
-            genre = "Thriller";
-        } else if (lowerCaseDreamText.includes("love") || lowerCaseDreamText.includes("romantic") || lowerCaseDreamText.includes("kiss")) {
-            genre = "Romance";
-        } else if (lowerCaseDreamText.includes("fly") || lowerCaseDreamText.includes("light") || lowerCaseDreamText.includes("magic")) {
-            genre = "Fantasy";
-        } else if (lowerCaseDreamText.includes("laugh") || lowerCaseDreamText.includes("funny") || lowerCaseDreamText.includes("weird")) {
-            genre = "Comedy";
-        } else {
-            // Default genre if no specific keywords are found
-            genre = "General Drama";
-        }
+// ============================================================================
+// INPUT (GİRDİ MANTIGI)
+// Katılımcı eylemlerini yakalar ve sistem durumuna aktarır.
+// ============================================================================
 
-        // --- Flowchart Logic: Display result to user ---
-        displayResult(genre);
-    }
+// Fare veya Dokunma Konumunu Canvas Koordinatına Çevirme
+function getCanvasCoords(event) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  return {
+    x: (clientX - rect.left) * (canvas.width / rect.width),
+    y: (clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
 
-    // --- Function to display the genre and apply visual feedback ---
-    function displayResult(genre) {
-        // Ensure result container is visible
-        resultContainer.classList.remove('hidden');
+// Ekosisteme Yeni Canlı/Enerji Ekleme
+function injectEnergy(x, y) {
+  // Tasarım kuralı: Maksimum kapasiteye ulaşıldıysa en eski canlı silinir
+  if (state.organisms.length >= DESIGN.maxOrganisms) {
+    state.organisms.shift();
+  }
 
-        // Update the text content
-        genreResultText.textContent = genre;
+  state.organisms.push({
+    x: x,
+    y: y,
+    radius: DESIGN.initialRadius,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: (Math.random() - 0.5) * 1.5,
+    pulse: Math.random() * Math.PI
+  });
+}
 
-        // Apply visual feedback (colors) based on the genre
-        removeGenreClasses(resultContainer); // Remove any existing genre classes first
-        switch (genre) {
-            case "Thriller":
-                resultContainer.classList.add('genre-thriller');
-                break;
-            case "Romance":
-                resultContainer.classList.add('genre-romance');
-                break;
-            case "Fantasy":
-                resultContainer.classList.add('genre-fantasy');
-                break;
-            case "Comedy":
-                resultContainer.classList.add('genre-comedy');
-                break;
-            default:
-                // For "General Drama" or any other unlisted genre
-                resultContainer.classList.add('genre-default');
-                break;
-        }
-
-        // Scroll to the result to make it more noticeable on smaller screens
-        resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    // --- Helper function to remove all genre-specific background classes ---
-    function removeGenreClasses(element) {
-        element.classList.remove('genre-thriller', 'genre-romance', 'genre-fantasy', 'genre-comedy', 'genre-default');
-    }
+// Fare Tıklaması
+canvas.addEventListener('click', (e) => {
+  const coords = getCanvasCoords(e);
+  injectEnergy(coords.x, coords.y);
 });
+
+// Dokunmatik Ekran Desteği
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const coords = getCanvasCoords(e);
+  injectEnergy(coords.x, coords.y);
+}, { passive: false });
+
+// Klavye Kontrolleri
+canvas.addEventListener('keydown', (e) => {
+  state.keyboardCursor.visible = true;
+  updateCursorPosition();
+
+  switch (e.key) {
+    case 'ArrowUp':
+      state.keyboardCursor.y = Math.max(10, state.keyboardCursor.y - DESIGN.keyboardStep);
+      break;
+    case 'ArrowDown':
+      state.keyboardCursor.y = Math.min(state.canvasHeight - 10, state.keyboardCursor.y + DESIGN.keyboardStep);
+      break;
+    case 'ArrowLeft':
+      state.keyboardCursor.x = Math.max(10, state.keyboardCursor.x - DESIGN.keyboardStep);
+      break;
+    case 'ArrowRight':
+      state.keyboardCursor.x = Math.min(state.canvasWidth - 10, state.keyboardCursor.x + DESIGN.keyboardStep);
+      break;
+    case ' ':
+    case 'Enter':
+      e.preventDefault();
+      injectEnergy(state.keyboardCursor.x, state.keyboardCursor.y);
+      break;
+    case 'p':
+    case 'P':
+      togglePause();
+      break;
+  }
+  updateCursorPosition();
+});
+
+// Duraklatma & Sıfırlama Buton Dinleyicileri
+btnPause.addEventListener('click', togglePause);
+btnReset.addEventListener('click', resetEcosystem);
+
+function togglePause() {
+  state.isPaused = !state.isPaused;
+  btnPause.textContent = state.isPaused ? 'Resume' : 'Pause';
+}
+
+function resetEcosystem() {
+  state.organisms = [];
+  state.isPaused = false;
+  btnPause.textContent = 'Pause';
+}
+
+// ============================================================================
+// RULES (SİSTEM KURALLARI VE FİZİK)
+// Tasarımcının koyduğu kurallar doğrultusunda canlıların davranışını günceller.
+// ============================================================================
+function updateRules() {
+  if (state.isPaused) return;
+
+  for (let i = 0; i < state.organisms.length; i++) {
+    const org = state.organisms[i];
+
+    // 1. Kural: Büyüme ve Atım (Pulse) Mantığı
+    if (org.radius < DESIGN.maxRadius) {
+      org.radius += DESIGN.growthRate;
+    }
+    org.pulse += 0.05;
+
+    // 2. Kural: Ekran Sınırlarından Sekme
+    org.x += org.vx;
+    org.y += org.vy;
+
+    if (org.x - org.radius < 0 || org.x + org.radius > state.canvasWidth) org.vx *= -1;
+    if (org.y - org.radius < 0 || org.y + org.radius > state.canvasHeight) org.vy *= -1;
+
+    // 3. Kural: Canlıların Birbirini İtmesi (İtiş Gücü)
+    for (let j = i + 1; j < state.organisms.length; j++) {
+      const other = state.organisms[j];
+      const dx = other.x - org.x;
+      const dy = other.y - org.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const minDist = org.radius + other.radius;
+
+      if (distance < minDist && distance > 0) {
+        const overlap = minDist - distance;
+        const nx = dx / distance;
+        const ny = dy / distance;
+
+        org.x -= nx * overlap * 0.5 * DESIGN.repulsionForce;
+        org.y -= ny * overlap * 0.5 * DESIGN.repulsionForce;
+        other.x += nx * overlap * 0.5 * DESIGN.repulsionForce;
+        other.y += ny * overlap * 0.5 * DESIGN.repulsionForce;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// OUTPUT (GÖRSEL VE ARAYÜZ ÇIKTISI)
+// Sistemin son durumunu tuvale çizer ve paneldeki metinleri günceller.
+// ============================================================================
+function render() {
+  // Arka planı temizle
+  ctx.fillStyle = DESIGN.colors.background;
+  ctx.fillRect(0, 0, state.canvasWidth, state.canvasHeight);
+
+  const isOvercrowded = state.organisms.length > DESIGN.overcrowdThreshold;
+  const activeColor = isOvercrowded ? DESIGN.colors.crowded : DESIGN.colors.normal;
+
+  // Canlıları Çiz
+  state.organisms.forEach((org) => {
+    const currentRadius = org.radius + Math.sin(org.pulse) * 1.5;
+
+    ctx.beginPath();
+    ctx.arc(org.x, org.y, Math.max(2, currentRadius), 0, Math.PI * 2);
+    ctx.fillStyle = activeColor;
+    ctx.fill();
+
+    // Dış Halka (Sadece renk değil, form desteği için)
+    ctx.beginPath();
+    ctx.arc(org.x, org.y, Math.max(4, currentRadius + 4), 0, Math.PI * 2);
+    ctx.strokeStyle = activeColor;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Arayüz Metinlerini Güncelle
+  countEl.textContent = state.organisms.length;
+  stateEl.textContent = isOvercrowded ? 'High Density (Crowded)' : 'Balanced';
+  stateEl.style.color = isOvercrowded ? DESIGN.colors.crowded : DESIGN.colors.normal;
+}
+
+// Klavye İmlecini Gösterme/Yerleştirme
+function updateCursorPosition() {
+  if (state.keyboardCursor.visible) {
+    cursorEl.hidden = false;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = rect.width / state.canvasWidth;
+    const scaleY = rect.height / state.canvasHeight;
+
+    cursorEl.style.left = `${state.keyboardCursor.x * scaleX}px`;
+    cursorEl.style.top = `${state.keyboardCursor.y * scaleY}px`;
+  }
+}
+
+// Ana Döngü (Game Loop)
+function loop() {
+  updateRules();
+  render();
+  requestAnimationFrame(loop);
+}
+
+// Başlatma
+loop();

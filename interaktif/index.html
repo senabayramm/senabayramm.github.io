@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daralan Evren | NMED 3203</title>
+    <style>
+        :root {
+            --bg-color: #121216;
+            --container-bg: #1c1c24;
+            --text-color: #e2e2ed;
+            --accent-color: #4f46e5;
+            --border-color: #3f3f46;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .wrapper {
+            text-align: center;
+            width: 100%;
+            max-width: 700px;
+            padding: 20px;
+        }
+        h1 { font-size: 1.3rem; margin-bottom: 5px; letter-spacing: 1px; }
+        p.instruction { font-size: 0.85rem; color: #a1a1aa; margin-bottom: 25px; }
+
+        #universe {
+            width: 100%;
+            height: 350px;
+            background-color: var(--container-bg);
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar {
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .controls-area {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button, input {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            outline: none;
+        }
+        button:hover { background-color: var(--border-color); }
+        
+        #status-info {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #a1a1aa;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.75rem;
+            color: #71717a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <h1>DARALAN EVREN</h1>
+        <p class="instruction">Farenizle hareket edin veya aşağıdaki yön tuşlarını (alternatif girdi) kullanın. Her eylem evreninizi daraltır.</p>
+        
+        <div id="universe">
+            <div class="avatar" id="player"></div>
+        </div>
+
+        <div class="controls-area">
+            <button onclick="movePlayer(0, -20)">Yukarı [W]</button>
+            <button onclick="movePlayer(-20, 0)">Sol [A]</button>
+            <button onclick="movePlayer(0, 20)">Aşağı [S]</button>
+            <button onclick="movePlayer(20, 0)">Sağ [D]</button>
+        </div>
+
+        <div id="status-info">Kalan Evren Boyutu: %100</div>
+    </div>
+
+    <footer>NMED 3203 IMA Lab - Agency x Possibility</footer>
+
+    <script>
+        const SETTINGS = {
+            SHRINK_STEP_PX: 12,
+            MIN_SIZE_LIMIT: 100,
+            MOVE_SPEED: 15
+        };
+
+        const universe = document.getElementById('universe');
+        const player = document.getElementById('player');
+        const statusInfo = document.getElementById('status-info');
+
+        let posX = 0;
+        let posY = 0;
+        let currentWidth = 700;
+        let currentHeight = 350;
+        let actionCount = 0;
+
+        function movePlayer(dx, dy) {
+            posX += dx;
+            posY += dy;
+
+            actionCount++;
+            if (currentWidth > SETTINGS.MIN_SIZE_LIMIT) {
+                currentWidth -= SETTINGS.SHRINK_STEP_PX;
+                currentHeight -= SETTINGS.SHRINK_STEP_PX / 2;
+                universe.style.width = currentWidth + 'px';
+                universe.style.height = currentHeight + 'px';
+            }
+
+            player.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
+            
+            let percentage = Math.max(10, Math.round((currentWidth / 700) * 100));
+            statusInfo.textContent = `Toplam Hamle: ${actionCount} | Kalan Evren Alanı: %${percentage}`;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w') movePlayer(0, -SETTINGS.MOVE_SPEED);
+            if (e.key === 'ArrowDown' || e.key === 's') movePlayer(0, SETTINGS.MOVE_SPEED);
+            if (e.key === 'ArrowLeft' || e.key === 'a') movePlayer(-SETTINGS.MOVE_SPEED, 0);
+            if (e.key === 'ArrowRight' || e.key === 'd') movePlayer(SETTINGS.MOVE_SPEED, 0);
+        });
+    </script>
+</body>
+</html>

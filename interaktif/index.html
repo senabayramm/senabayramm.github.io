@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daralan Evren: Dijital Sınırlama | NMED 3203</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --surface: #18181b;
+            --border: #27272a;
+            --text: #f4f4f5;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .app-container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.instruction {
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            margin-bottom: 20px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 30px var(--accent-glow);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 auto;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls-panel {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-ctrl {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-ctrl:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-ctrl:active {
+            transform: translateY(0);
+        }
+
+        .status-bar {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #71717a;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.7rem;
+            color: #52525b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h1>DARALAN EVREN</h1>
+        <p class="instruction">Fare ile gezinin veya aşağıdaki yön tuşlarını kullanın. Her eylem evreninizin sınırlarını daraltır.</p>
+        
+        <div class="canvas-wrapper" id="canvasBox">
+            <canvas id="simCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel">
+            <button class="btn-ctrl" onclick="moveAvatar(0, -25)">Yukarı [W]</button>
+            <button class="btn-ctrl" onclick="moveAvatar(-25, 0)">Sol [A]</button>
+            <button class="btn-ctrl" onclick="moveAvatar(0, 25)">Aşağı [S]</button>
+            <button class="btn-ctrl" onclick="moveAvatar(25, 0)">Sağ [D]</button>
+        </div>
+
+        <div class="status-bar" id="statusText">Toplam Hamle: 0 | Kalan Sınır Alanı: %100</div>
+    </div>
+
+    <footer>NMED 3203 IMA Lab — Agency x Possibility</footer>
+
+    <script>
+        const SETTINGS = {
+            SHRINK_RATE: 14,
+            MIN_LIMIT: 120,
+            GLOW_INTENSITY: 20
+        };
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasBox = document.getElementById('canvasBox');
+        const statusText = document.getElementById('statusText');
+
+        let width = 750;
+        let height = 380;
+        
+        function resizeCanvas() {
+            canvas.width = width;
+            canvas.height = height;
+        }
+        resizeCanvas();
+
+        let posX = width / 2;
+        let posY = height / 2;
+        let targetX = posX;
+        let targetY = posY;
+        let actionCount = 0;
+        let maxContainerWidth = 750;
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            targetX = e.clientX - rect.left;
+            targetY = e.clientY - rect.top;
+        });
+
+        function moveAvatar(dx, dy) {
+            targetX = Math.max(20, Math.min(width - 20, targetX + dx));
+            targetY = Math.max(20, Math.min(height - 20, targetY + dy));
+            triggerShrink();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const step = 30;
+            if (e.key === 'ArrowUp' || e.key === 'w') moveAvatar(0, -step);
+            if (e.key === 'ArrowDown' || e.key === 's') moveAvatar(0, step);
+            if (e.key === 'ArrowLeft' || e.key === 'a') moveAvatar(-step, 0);
+            if (e.key === 'ArrowRight' || e.key === 'd') moveAvatar(step, 0);
+        });
+
+        function triggerShrink() {
+            actionCount++;
+            if (width > SETTINGS.MIN_LIMIT) {
+                width -= SETTINGS.SHRINK_RATE;
+                height -= SETTINGS.SHRINK_RATE * 0.5;
+                canvasBox.style.width = width + 'px';
+                canvasBox.style.height = height + 'px';
+                resizeCanvas();
+            }
+            let percentage = Math.max(15, Math.round((width / maxContainerWidth) * 100));
+            statusText.textContent = `Toplam Hamle: ${actionCount} | Kalan Sınır Alanı: %${percentage}`;
+        }
+
+        function animate() {
+            posX += (targetX - posX) * 0.1;
+            posY += (targetY - posY) * 0.1;
+
+            ctx.fillStyle = '#18181b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#27272a';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+
+            ctx.shadowColor = '#818cf8';
+            ctx.shadowBlur = SETTINGS.GLOW_INTENSITY;
+            ctx.fillStyle = '#6366f1';
+            ctx.beginPath();
+            ctx.arc(posX, posY, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(posX, posY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

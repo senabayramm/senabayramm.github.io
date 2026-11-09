@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrono Swarm · Temporality × Emergence</title>
+  <meta name="description" content="An interactive 8-string harp where your delayed Time Ghosts (G1–G3) and 10 autonomous bouncing orbs pluck musical strings. NMED 3203 premise remix: Temporality × Emergence.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient background gradient orbs -->
+  <div class="ambient-orb orb-cyan" aria-hidden="true"></div>
+  <div class="ambient-orb orb-violet" aria-hidden="true"></div>
+  <div class="ambient-orb orb-rose" aria-hidden="true"></div>
+
+  <div class="glass-shell">
+    <!-- TOP GLASS HEADER -->
+    <header class="topbar">
+      <div class="brand-group">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <h1>Chrono Swarm</h1>
+        <span class="premise-pill">TEMPORALITY × EMERGENCE</span>
+      </div>
+
+      <p class="instruction-inline">
+        <b>1. Click anywhere</b> to turn on sound · <b>2. Move mouse up/down</b> across the <b>8 Guitar Strings (S1–S8)</b> to play notes now + via delayed <b>Time Ghosts (G1–G3)</b> · <b>3. Click stage</b> to add <b>Bounce Bumpers (B1–B6)</b>!
+      </p>
+
+      <div class="top-actions" role="group" aria-label="Audio toggle">
+        <button id="mute-btn" class="glass-btn primary" aria-pressed="false" title="Turn sound on or mute (Key: M)">🔊 Turn On Sound <kbd>M</kbd></button>
+      </div>
+    </header>
+
+    <!-- SELF-EXPLANATORY CAUSE → EFFECT TELEMETRY DECK -->
+    <section class="telemetry-grid" aria-label="Live cause and effect rules">
+      <div class="glass-card rules-card">
+        <div class="card-kicker">HOW YOUR INPUTS CHANGE SOUND &amp; SWARM RULES (LIVE STATE):</div>
+        <div class="readout-chips">
+          <span class="chip chip-primary" id="r-state">🔊 CLICK ANYWHERE TO START SOUND</span>
+          <span class="chip chip-cyan" id="r-memory">⏳ Memory 75% → Ghost Delay 558ms · Echo 38% (0.35s)</span>
+          <span class="chip chip-violet" id="r-cohesion">✦ Grouping 65% → Flock Pull ×1.13 (0 web lines)</span>
+          <span class="chip chip-rose" id="r-boundaries">♪ Strings S1–S8 · 3/6 Bumpers · 0 Notes Played</span>
+        </div>
+        <p class="event-ticker" id="last-event" aria-hidden="true">
+          🔊 CLICK ANYWHERE ON THE SCREEN TO TURN ON SOUND — MOVE YOUR MOUSE ACROSS STRINGS S1–S8 TO PLAY!
+        </p>
+      </div>
+
+      <!-- 4 SELF-EXPLANATORY EMERGENT LAYER STATUS PILLS -->
+      <div class="glass-card layers-card">
+        <div class="card-kicker">VISUAL &amp; SOUND LAYERS CONTROLLED BY SLIDER THRESHOLDS:</div>
+        <ul class="layer-pills" aria-label="Visual and sound layers controlled by Memory and Grouping sliders">
+          <li data-layer="ghostTrails" title="Time Ghosts G1–G3 and blue trail stay visible when Memory is at least 20%">
+            <span class="pill-check" aria-hidden="true">✓</span>
+            <span class="pill-title">Time Ghost Trails (G1–G3)</span>
+            <span class="pill-state">VISIBLE (Memory ≥20%)</span>
+          </li>
+          <li data-layer="alignmentWeb" title="Purple web lines connect nearby orbs when Swarm Grouping is at least 35%">
+            <span class="pill-check" aria-hidden="true">✓</span>
+            <span class="pill-title">Purple Swarm Web Lines</span>
+            <span class="pill-state">VISIBLE (Grouping ≥35%)</span>
+          </li>
+          <li data-layer="boundaryChimes" title="Round Bumpers (B1–B6) bounce the orbs into the 8 strings">
+            <span class="pill-check" aria-hidden="true">✓</span>
+            <span class="pill-title">Bounce Bumpers (B1–B6)</span>
+            <span class="pill-state">ACTIVE (3 Bounce Bumpers)</span>
+          </li>
+          <li data-layer="phaseVortex" title="Plays a special chord when 4 or more orbs gather around a Time Ghost">
+            <span class="pill-check" aria-hidden="true">✕</span>
+            <span class="pill-title">Vortex Chord (≥4 Orbs)</span>
+            <span class="pill-state">WAITING (0/4 Orbs on Ghost)</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE 8-STRING STAGE -->
+    <main class="stage-wrap">
+      <canvas id="stage" tabindex="0"
+        aria-label="8 horizontal musical strings S1 to S8. Move mouse or Arrow keys up and down to pluck strings now and with delayed Time Ghosts G1 to G3. Click or press Space to add or remove round Bounce Bumpers."
+        aria-describedby="theory-footer"></canvas>
+    </main>
+
+    <!-- MODERN GLASS CONTROL DOCK -->
+    <section class="control-dock" aria-label="Controls">
+      <div class="dock-cluster">
+        <button id="play-btn" class="glass-btn primary" aria-pressed="false">❚❚ Pause <kbd>P</kbd></button>
+        <button id="time-btn" class="glass-btn" title="Change speed between 0.5x Slow-Mo, 1.0x Normal, and 1.6x Fast (Key: T)">⏱ Speed: <b>1.0× Normal</b> <kbd>T</kbd></button>
+        <button id="clear-btn" class="glass-btn" title="Remove all round Bounce Bumpers B1–B6 (Key: C)">✕ Clear Bumpers <kbd>C</kbd></button>
+        <button id="reset-btn" class="glass-btn" title="Reset bumpers and sliders to default (Key: R)">↺ Reset <kbd>R</kbd></button>
+      </div>
+
+      <div class="slider-card">
+        <label for="memory-slider">
+          <span>⏳ ECHO MEMORY (TEMPORALITY · Ghost Delay &amp; Echo):</span>
+          <strong id="memory-val">75%</strong>
+        </label>
+        <div class="slider-row">
+          <button id="mem-down" class="glass-btn mini" type="button" title="Shorter delay & less echo (Key: [)">Shorter <kbd>[</kbd></button>
+          <input id="memory-slider" type="range" min="0" max="100" step="1" value="75" title="Controls how far behind Time Ghosts G1–G3 follow you and how much sound echo is added (hides Ghost Trails below 20%)">
+          <button id="mem-up" class="glass-btn mini" type="button" title="Longer delay & deeper echo (Key: ])">Longer <kbd>]</kbd></button>
+        </div>
+      </div>
+
+      <div class="slider-card">
+        <label for="cohesion-slider">
+          <span>✦ SWARM GROUPING (EMERGENCE · Orb Flocking):</span>
+          <strong id="cohesion-val">65%</strong>
+        </label>
+        <div class="slider-row">
+          <button id="coh-down" class="glass-btn mini" type="button" title="Scatter orbs apart (Key: Q)">Scatter <kbd>Q</kbd></button>
+          <input id="cohesion-slider" type="range" min="0" max="100" step="1" value="65" title="Controls whether the 10 sound orbs scatter apart or group together around your Time Ghosts (hides Purple Web below 35%)">
+          <button id="coh-up" class="glass-btn mini" type="button" title="Group orbs together (Key: E)">Group <kbd>E</kbd></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES & DESIGN RULES FOOTER -->
+    <footer class="theory-footer" id="theory-footer" aria-label="Academic sources and the code rules they govern">
+      <div class="source-card">
+        <a href="https://www.ida.liu.se/~arzba60/Course/SlowTech.pdf" target="_blank" rel="noopener noreferrer">1. Hallnäs &amp; Redström (2001) PDF ↗</a>
+        <span><b>Temporal Delay Rule (<code>js/rules.js</code>):</b> Maps <b>Echo Memory</b> to Time-Ghost lag (<code>280–650ms</code>) and sound echo (<code>8%–48%</code>); hides ghost trails below <code>20%</code> memory.</span>
+      </div>
+      <div class="source-card">
+        <a href="https://www.cs.toronto.edu/~dt/siggraph97-course/cwr87/" target="_blank" rel="noopener noreferrer">2. Reynolds (1987) Boids Paper ↗</a>
+        <span><b>Swarm Flocking Rule (<code>js/swarm.js</code>):</b> Moves the 10 sound orbs using local <b>Separation</b>, <b>Alignment</b>, and <b>Cohesion</b> rules while pulling them toward delayed Time Ghosts <code>G1–G3</code>.</span>
+      </div>
+      <div class="source-card">
+        <a href="https://www.jesperjuul.net/text/openandtheclosed.html" target="_blank" rel="noopener noreferrer">3. Juul (2002) Emergence Article ↗</a>
+        <span><b>Emergent Melody Rule (<code>js/audio.js</code>):</b> Instead of a fixed song, music emerges as orbs bounce off <b>Bumpers (B1–B6)</b>, cross <b>Strings (S1–S8)</b>, or gather <code>≥4</code> orbs on a Ghost.</span>
+      </div>
+      <div class="source-card">
+        <a href="https://mertseven.com/ima/lab/bibliography.html" target="_blank" rel="noopener noreferrer">4. IMA Lab (NMED 3203) ↗</a>
+        <span><b>Premise Remix:</b> Combines Collection 04 <i>Ghost Chase</i> (delayed cursor ghosts) × Collection 07 <i>Boundary Lines</i> (autonomous swarm &amp; boundary bounces).</span>
+      </div>
+    </footer>
+  </div>
+
+  <p id="live" class="sr-only" aria-live="polite"></p>
+
+  <script src="js/config.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/temporal.js"></script>
+  <script src="js/swarm.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
